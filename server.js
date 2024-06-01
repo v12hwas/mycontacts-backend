@@ -4,6 +4,8 @@ dotenv.config();
 
 import router from "../mycontacts-backend/routes/contactRoutes.js";
 
+import userrouter from "../mycontacts-backend/routes/userRoutes.js";
+
 import errorHandler from "./middleware/errorHandler.js"; //auto imported on calling app.use(errorHandler)
 
 import connectDb from "./config/dbConnection.js";
@@ -19,6 +21,8 @@ connectDb();
 app.use(express.json()); //to get req body
 
 app.use("/api/contacts", router);
+
+app.use("/api/users", userrouter);
 
 app.use(errorHandler);
 // to get error message in req body if empty in json format and not html after handling the error in create contact
