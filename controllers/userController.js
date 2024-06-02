@@ -2,7 +2,14 @@ import asyncHandler from "express-async-handler";
 
 import userModel from "../models/userModel.js";
 
-import bcrpyt from "bcrypt";
+import bcrypt from "bcrypt";
+
+import jwt from "jsonwebtoken";
+
+import dotenv from "dotenv";
+dotenv.config();
+
+//register user
 
 const userRegister = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
@@ -15,7 +22,7 @@ const userRegister = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("user already regsitered");
   }
-  const hashpassword = await bcrpyt.hash(password, 10);
+  const hashpassword = await bcrypt.hash(password, 10);
   console.log(`hashed pwd : ${hashpassword}`);
   const user = await userModel.create({
     username,
@@ -32,9 +39,45 @@ const userRegister = asyncHandler(async (req, res) => {
   }
   //   res.json({ message: "register the user" });
 });
+//
+//
+//
 
+//login user
 const loginUser = asyncHandler(async (req, res) => {
-  res.json({ message: "login the user" });
+  const { email, password } = req.body;
+  if (!email || !password) {
+    res.status(400);
+    throw new Error("all fields needed");
+  }
+  const user = await userModel.findOne({ email });
+  if (user) {
+    const ans = await bcrypt.compare(password, user.password);
+    if (ans) {
+      const accessToken = jwt.sign(
+        {
+          user: {
+            username: user.username,
+            email: user.email,
+            id: user.id,
+          },
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "1m" }
+      );
+
+      res.status(200).json({ accessToken });
+    } else {
+      res.status(401);
+      throw new Error("email or password not valid");
+    }
+  }
+  //   else {
+  //     res.status(401);
+  //     throw new Error("User not found");
+  //   }
+
+  //   res.json({ message: "login the user" });
 });
 
 const currentUser = asyncHandler(async (req, res) => {
