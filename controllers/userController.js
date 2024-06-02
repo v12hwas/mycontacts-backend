@@ -71,17 +71,18 @@ const loginUser = asyncHandler(async (req, res) => {
       res.status(401);
       throw new Error("email or password not valid");
     }
+  } else {
+    res.status(401);
+    throw new Error("User not found");
   }
-  //   else {
-  //     res.status(401);
-  //     throw new Error("User not found");
-  //   }
 
   //   res.json({ message: "login the user" });
 });
 
+//current user info
 const currentUser = asyncHandler(async (req, res) => {
-  res.json({ message: "current user" });
+  //   res.json({ message: "current user information" });
+  res.json(req.user);
 });
 
 export { userRegister, loginUser, currentUser };
