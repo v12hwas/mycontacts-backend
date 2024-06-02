@@ -1,6 +1,7 @@
 //@desc get all contacts
 //@route GET /api/contact
 //@access public
+//@access is now private after user id is added in conatct model.
 
 import asyncHandler from "express-async-handler";
 //wrapping all function by making use of asynhandler so that try catch block is not needed. this is done so as to implement mogodb database since it gives a promise.
@@ -8,7 +9,7 @@ import asyncHandler from "express-async-handler";
 import model from "../models/contactModel.js";
 
 const getContact = asyncHandler(async (req, res) => {
-  const contacts = await model.find();
+  const contacts = await model.find({ user_id: req.user.id });
   res.json(contacts);
 });
 
@@ -34,8 +35,9 @@ const createContact = asyncHandler(async (req, res) => {
     name,
     email,
     phone,
+    user_id: req.user.id,
   });
-  res.json({ message: "created a new contacts" });
+  res.json({ contacts });
 });
 
 const updateContact = asyncHandler(async (req, res) => {
