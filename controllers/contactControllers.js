@@ -47,6 +47,12 @@ const updateContact = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("contact not found");
   }
+
+  if (contact.user_id.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("user doesnt have permission to update others contacts");
+  }
+
   const updatedcontact = await model.findByIdAndUpdate(
     req.params.id,
     req.body,
@@ -65,34 +71,17 @@ const deleteContact = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error("contact not found");
   }
+
+  if (contact.user_id.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("user doesnt have permission to delete others contacts");
+  }
+
   const deletecontact = await model.findByIdAndDelete(id);
   console.log("successfully deleted");
   res.json({ deletecontact });
   //   res.json({ message: "Contact deleted successfully" });
 });
-
-// const deleteContact = asyncHandler(async (req, res) => {
-//   const id = req.params.id;
-
-//   console.log(`Attempting to delete contact with id: ${id}`);
-
-//   // Check if the ID is a valid MongoDB ObjectID
-//   if (!mongoose.Types.ObjectId.isValid(id)) {
-//     res.status(400);
-//     throw new Error("Invalid contact ID");
-//   }
-
-//   // Attempt to find and delete the contact
-//   const contact = await Contact.findByIdAndDelete(id);
-
-//   if (!contact) {
-//     res.status(404);
-//     throw new Error("Contact not found");
-//   }
-
-//   console.log(`Successfully deleted contact with id: ${id}`);
-//   res.json({ message: "Contact deleted successfully" });
-// });
 
 export {
   getContact,
